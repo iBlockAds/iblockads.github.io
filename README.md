@@ -4,8 +4,10 @@ This's our configuration profile for [DNS over TLS](https://en.wikipedia.org/wik
 
 Homepage: https://iblockads.net/
 
-Server Name: dns.iblockads.net 
+Public Filter: https://cdn.iblockads.net/iblockads.net.txt
+
+Server Name: dns.iblockads.net
 
 | Name                      | Country | Notes                                                                                                                                   | Installation                                                                                                                                                                                                      |
 |---------------------------|---------|-----------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| iBlockAds DNS for iOS          | VN      | Operated by [iBlockAds](https://iblockads.net) - Blocking Ads, Malwares, Tracking & Phishing                                            | [Click](https://github.com/iBlockAds/iblockads.github.io/raw/main/dns.mobileconfig)
+| iBlockAds DNS for iOS          | VN      | Operated by [iBlockAds](https://iblockads.net) - Blocking Ads, Malwares, Tracking & Phishing                                            | [Click](https://go.iblockads.net/raw/main/dns)
