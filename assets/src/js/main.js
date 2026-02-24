@@ -97,7 +97,6 @@ class AdBlockTester {
         this.pendingChecks = [];
     }
 
-    // Modern clipboard (works instantly)
     copyToClip(str) {
         if (navigator.clipboard && window.isSecureContext) {
             navigator.clipboard.writeText(str).then(() => {
@@ -107,7 +106,6 @@ class AdBlockTester {
             this.oldCopy(str);
         }
     }
-
     oldCopy(str) {
         const el = document.createElement('textarea');
         el.value = str;
@@ -172,8 +170,8 @@ class AdBlockTester {
     }
 
     async fetchTests() {
+        const testingInfoLoading = document.getElementById("testingInfo");
         const fragment = document.createDocumentFragment();
-        // ... (same as before - normal categories + OEM) ...
         for (const element in data) {
             const catEl = document.createElement("div");
             catEl.id = element;
@@ -181,6 +179,9 @@ class AdBlockTester {
             fragment.appendChild(catEl);
 
             const category = data[element];
+            let countTests = 0;
+            const testInfo = document.createElement("div");
+
             for (const key in category) {
                 const div = document.createElement('div');
                 const dw = document.createElement('div');
@@ -193,10 +194,18 @@ class AdBlockTester {
 
                 const value = category[key];
                 const items = Array.isArray(value) ? value : [value];
-                for (const u of items) this.pendingChecks.push(() => this.check_url(u, dw, div));
+
+                for (const u of items) {
+                    this.pendingChecks.push(() => this.check_url(u, dw, div));
+                    countTests++;
+                }
+
+                testInfo.innerHTML = `Kiểm tra dữ liệu => ${element} | Số lần kiểm tra => ${countTests}`;
+                testingInfoLoading.appendChild(testInfo);
             }
         }
 
+        // OEM section
         const oemTest = document.createElement("div");
         oemTest.id = "OEM";
         oemTest.innerHTML = `<h3>${icons["OEM"]}&nbsp;&nbsp;OEM</h3>`;
@@ -214,23 +223,24 @@ class AdBlockTester {
 
             const value = dataOEM[key];
             const items = Array.isArray(value) ? value : [value];
-            for (const u of items) this.pendingChecks.push(() => this.check_url(u, dw, div, true));
+            for (const u of items) {
+                this.pendingChecks.push(() => this.check_url(u, dw, div, true));
+            }
         }
 
         this.testWrapper.appendChild(fragment);
+
         await this.withConcurrencyLimit(this.pendingChecks, 8);
     }
 }
 
-// ====================== GLOBAL INSTANCE & HELPERS (IMMEDIATE) ======================
-let adBlockTester = new AdBlockTester();   // ← created instantly
-
-// Make modal button and other onclicks work immediately
+// ====================== GLOBAL INSTANCE (immediate) ======================
+let adBlockTester = new AdBlockTester();
 window.copyToClip = (str) => adBlockTester.copyToClip(str);
 window.show_info   = (t)  => adBlockTester.show_info(t);
-window.adBlockTester = adBlockTester;   // just in case
+window.adBlockTester = adBlockTester;
 
-// ====================== INITIALIZE EVERYTHING ======================
+// ====================== START EVERYTHING ======================
 window.onload = function () {
     new Navbar();
     new ThemeManager();
@@ -238,7 +248,7 @@ window.onload = function () {
     new AOS();
     new Modal();
 
-    adBlockTester.pendingChecks = [];   // reset for safety
+    adBlockTester.pendingChecks = [];
 
     adBlockTester.fetchTests().then(() => {
         const loading = document.querySelector(".loadingWrap");
