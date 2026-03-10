@@ -54,7 +54,7 @@ class GoTop {
     constructor() {
         this.btn = document.getElementById('gt-link');
         if (!this.btn) return;
-        window.addEventListener("scroll", () => this.btn.classList.toggle("hidden", window.scrollY === 0));
+        window.addEventListener("scroll", () => this.btn.classList.toggle("hidden", window.scrollY === 0), { passive: true });
         this.btn.addEventListener("click", e => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); });
     }
 }
@@ -76,85 +76,123 @@ class Modal {
     }
 }
 
+// ====================== SEMAPHORE ======================
+class Semaphore {
+    constructor(limit) {
+        this._limit = limit;
+        this._active = 0;
+        this._queue = [];
+        this._head = 0;
+    }
+    acquire() {
+        if (this._active < this._limit) { this._active++; return Promise.resolve(); }
+        return new Promise(resolve => this._queue.push(resolve));
+    }
+    release() {
+        if (this._head < this._queue.length) {
+            const next = this._queue[this._head];
+            this._queue[this._head] = null; 
+            this._head++;
+            if (this._head > 64 && this._head > (this._queue.length >> 1)) {
+                this._queue = this._queue.slice(this._head);
+                this._head = 0;
+            }
+            next(); 
+        } else {
+            this._active--;
+        }
+    }
+}
+
 // ====================== MAIN TESTER ======================
 class AdBlockTester {
     constructor() {
         this.totalTests = 0;
         this.blockedCount = 0;
-        this.completedCount = 0;
         this.CONCURRENCY = 40;
-        this.TIMEOUT_MS = 3000;
+        this.TIMEOUT_MS  = 3000;
 
         this.bar = new RadialProgress(document.getElementById('bar'), {
-            colorBg: "#ff3b3f",
-            colorFg: "#3cc47c",
-            colorText: "#202020",
-            thick: 12
+            colorBg: "#ff3b3f", colorFg: "#3cc47c", colorText: "#202020", thick: 12
         });
         this.notification = new Notif({
-            topPos: 10,
-            classNames: 'success',
-            autoClose: true,
-            autoCloseTimeout: 2000
+            topPos: 10, classNames: 'success', autoClose: true, autoCloseTimeout: 2000
         });
         this.testWrapper = document.getElementById("test");
         this.pendingChecks = [];
-        this._domCache = new Map();
+        this._sem = new Semaphore(this.CONCURRENCY);
+        this._hostnameCache = new Map();
+        this._paintQueue  = [];
+        this._rafScheduled = false;
+        this._activeTest = null;
     }
 
-    copyToClip(str) {
-        if (navigator.clipboard && window.isSecureContext) {
-            navigator.clipboard.writeText(str).then(() => {
-                this.notification.showN('Đã sao chép URL vào bộ nhớ tạm!', 'success');
-            }).catch(() => this.oldCopy(str));
-        } else {
-            this.oldCopy(str);
+    _schedulePaint(fn) {
+        this._paintQueue.push(fn);
+        if (!this._rafScheduled) {
+            this._rafScheduled = true;
+            requestAnimationFrame(() => {
+                this._rafScheduled = false;
+                const q = this._paintQueue.splice(0);
+                for (let i = 0; i < q.length; i++) q[i]();
+                if (this.totalTests > 0) this.bar.setValue(this.blockedCount / this.totalTests);
+            });
         }
     }
-    oldCopy(str) {
-        const el = document.createElement('textarea');
-        el.value = str;
-        el.style.cssText = 'position:absolute;left:-9999px';
-        document.body.appendChild(el);
-        el.select();
-        document.execCommand('copy');
-        el.remove();
-        this.notification.showN('Đã sao chép URL vào bộ nhớ tạm!', 'success');
+
+    _getHostname(url) {
+        try { return new URL(url).hostname; }
+        catch { return url; }
     }
 
-    _urlCache = new Map(); // url → Promise<boolean> (true = blocked)
-
     _fetchURL(url) {
-        if (this._urlCache.has(url)) return this._urlCache.get(url);
+        const hostname = this._getHostname(url);
+        if (this._hostnameCache.has(hostname)) return this._hostnameCache.get(hostname);
 
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), this.TIMEOUT_MS);
 
-        const p = fetch(url, { method: 'HEAD', mode: 'no-cors', signal: controller.signal })
-            .then(() => false)   // reachable → NOT blocked
-            .catch(() => true)   // error/abort → blocked
+        const p = fetch(url, {
+            method: 'HEAD',
+            mode: 'no-cors',
+            cache: 'no-store',
+            signal: controller.signal
+        })
+            .then(() => false)
+            .catch(() => true)  
             .finally(() => clearTimeout(timeoutId));
 
-        this._urlCache.set(url, p);
+        this._hostnameCache.set(hostname, p);
         return p;
     }
 
     async check_url(url, contentDiv, testDiv, isNonPoint = false) {
         if (!url.startsWith('http://') && !url.startsWith('https://')) url = 'https://' + url;
+
         const hostDiv = document.createElement("div");
         hostDiv.textContent = url;
         hostDiv.style.cursor = "pointer";
         hostDiv.title = "Nhấp để sao chép";
         hostDiv.onclick = () => this.copyToClip(url);
         contentDiv.appendChild(hostDiv);
-        const blocked = await this._fetchURL(url);
-        requestAnimationFrame(() => {
+
+        let blocked;
+        const hostname = this._getHostname(url);
+        if (this._hostnameCache.has(hostname)) {
+            blocked = await this._hostnameCache.get(hostname);
+        } else {
+            await this._sem.acquire();
+            try {
+                blocked = await this._fetchURL(url);
+            } finally {
+                this._sem.release();
+            }
+        }
+
+        this._schedulePaint(() => {
             if (blocked) {
                 hostDiv.style.background = "var(--green)";
-                if (!isNonPoint) {
-                    this.blockedCount++;
-                    this.bar.setValue(this.blockedCount / this.totalTests);
-                }
+                if (!isNonPoint) this.blockedCount++;
             } else {
                 testDiv.style.background = "var(--red)";
                 hostDiv.style.background = "var(--red)";
@@ -164,18 +202,15 @@ class AdBlockTester {
 
     show_info(t) {
         const testDiv = t.parentElement;
-        document.querySelectorAll(".test").forEach(el => { if (el !== testDiv) el.classList.remove("show"); });
+        if (this._activeTest && this._activeTest !== testDiv) {
+            this._activeTest.classList.remove("show");
+        }
         testDiv.classList.toggle("show");
+        this._activeTest = testDiv.classList.contains("show") ? testDiv : null;
     }
 
-    async withConcurrencyLimit(tasks, limit = this.CONCURRENCY) {
-        const executing = new Set();
-        for (const task of tasks) {
-            const p = task().finally(() => executing.delete(p));
-            executing.add(p);
-            if (executing.size >= limit) await Promise.race(executing);
-        }
-        return Promise.allSettled([...executing]);
+    async runAll(tasks) {
+        return Promise.allSettled(tasks.map(t => t()));
     }
 
     async fetchTests() {
@@ -202,9 +237,7 @@ class AdBlockTester {
                 div.appendChild(dw);
                 catEl.appendChild(div);
 
-                const value = category[key];
-                const items = Array.isArray(value) ? value : [value];
-
+                const items = Array.isArray(category[key]) ? category[key] : [category[key]];
                 for (const u of items) {
                     this.pendingChecks.push(() => this.check_url(u, dw, div));
                     if (!dataOEM.hasOwnProperty(key)) this.totalTests++;
@@ -233,34 +266,51 @@ class AdBlockTester {
             div.appendChild(dw);
             oemTest.appendChild(div);
 
-            const value = dataOEM[key];
-            const items = Array.isArray(value) ? value : [value];
+            const items = Array.isArray(dataOEM[key]) ? dataOEM[key] : [dataOEM[key]];
             for (const u of items) {
                 this.pendingChecks.push(() => this.check_url(u, dw, div, true));
             }
         }
 
-        // ── Single DOM insertion ──────────────────────────────────────────────
+        // Single DOM insertion
         this.testWrapper.appendChild(fragment);
 
-        // Append all info nodes at once
         const infoFrag = document.createDocumentFragment();
         infoNodes.forEach(n => infoFrag.appendChild(n));
         testingInfoLoading.appendChild(infoFrag);
 
-        await this.withConcurrencyLimit(this.pendingChecks, this.CONCURRENCY);
+        await this.runAll(this.pendingChecks);
+    }
+
+    copyToClip(str) {
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(str)
+                .then(() => this.notification.showN('Đã sao chép URL vào bộ nhớ tạm!', 'success'))
+                .catch(() => this.oldCopy(str));
+        } else {
+            this.oldCopy(str);
+        }
+    }
+    oldCopy(str) {
+        const el = document.createElement('textarea');
+        el.value = str;
+        el.style.cssText = 'position:absolute;left:-9999px';
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        el.remove();
+        this.notification.showN('Đã sao chép URL vào bộ nhớ tạm!', 'success');
     }
 }
 
 // ====================== GLOBAL INSTANCE ======================
 let adBlockTester = new AdBlockTester();
-
 window.copyToClip = (str) => adBlockTester.copyToClip(str);
-window.show_info = (t) => adBlockTester.show_info(t);
+window.show_info  = (t)  => adBlockTester.show_info(t);
 window.adBlockTester = adBlockTester;
 
 // ====================== START ======================
-window.onload = function () {
+document.addEventListener("DOMContentLoaded", function () {
     new Navbar();
     new ThemeManager();
     new GoTop();
@@ -280,4 +330,4 @@ window.onload = function () {
             }, 400);
         }
     });
-};
+});
