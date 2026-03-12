@@ -108,7 +108,16 @@
         this._running = true;
         var self = this;
         raf(function loop() {
-            var keepGoing = self._draw();
+            var keepGoing = false;
+            try {
+                keepGoing = self._draw();
+            } catch (e) {
+                // draw crashed (e.g. negative radius on first frame before layout)
+                // reset _running so _scheduleFrame can restart the loop
+                self._running = false;
+                setTimeout(function () { self._scheduleFrame(); }, 16);
+                return;
+            }
             if (keepGoing) {
                 raf(loop);
             } else {
@@ -148,8 +157,8 @@
 
         var ctx    = canvas.getContext('2d');
         var lw     = this.thick * bw * dp;
-        var glowPad = lw * 1.2;  // extra room so shadowBlur doesn't clip at canvas edge
-        var r      = H / 2 - (this.thick * bw * dp) / 2 - glowPad;
+        var r      = Math.max(1, H / 2 - lw / 2 - lw * 0.3);
+        // small inset (0.3×lw) gives glow room without risking negative r
         var TAU    = Math.PI * 2;
         var START  = -Math.PI / 2;
 
@@ -162,27 +171,46 @@
         ctx.clearRect(0, 0, W, H);
 
         // ═════════════════════════════════════════════════════════════════════
-        // 1. OUTER DECORATIVE RING — subtle rotating shimmer
+        // 1. OUTER DECORATIVE RING — two comet trails, opposite colors
         // ═════════════════════════════════════════════════════════════════════
         this._glowT += 0.018;
-        var outerR = H / 2 - lw * 0.15;
-        var shimA  = this._glowT % TAU;
-        var shimGrad = ctx.createLinearGradient(
-            cx + outerR * Math.cos(shimA),
-            cy + outerR * Math.sin(shimA),
-            cx - outerR * Math.cos(shimA),
-            cy - outerR * Math.sin(shimA)
-        );
-        shimGrad.addColorStop(0,   rgba(this.colorFg, 0.0));
-        shimGrad.addColorStop(0.4, rgba(this.colorFg, 0.0));
-        shimGrad.addColorStop(0.5, rgba(this.colorFg, 0.35));
-        shimGrad.addColorStop(0.6, rgba(this.colorFg, 0.0));
-        shimGrad.addColorStop(1,   rgba(this.colorFg, 0.0));
-        ctx.beginPath();
-        ctx.strokeStyle = shimGrad;
-        ctx.lineWidth   = dp * 0.8;
-        ctx.arc(cx, cy, outerR, 0, TAU);
-        ctx.stroke();
+        var outerR  = H / 2 - lw * 0.15;
+        var shimA   = this._glowT % TAU;
+        var shimLen = Math.PI * 0.55; // arc length (~100°)
+        var shimLw  = dp * 3;
+
+        // Draw comet: bright head + fading tail using layered arcs + alpha
+        function drawComet(startAngle, color) {
+            // Faded tail — full length, low opacity
+            ctx.save();
+            ctx.beginPath();
+            ctx.strokeStyle = color;
+            ctx.lineWidth   = shimLw;
+            ctx.lineCap     = 'round';
+            ctx.globalAlpha = 0.25;
+            ctx.arc(cx, cy, outerR, startAngle, startAngle + shimLen);
+            ctx.stroke();
+            ctx.restore();
+
+            // Bright head — last 20% of arc, full opacity + tight glow
+            var headStart = startAngle + shimLen * 0.8;
+            ctx.save();
+            ctx.beginPath();
+            ctx.strokeStyle = color;
+            ctx.lineWidth   = shimLw;
+            ctx.lineCap     = 'round';
+            ctx.shadowColor = color;
+            ctx.shadowBlur  = shimLw * 0.8;
+            ctx.globalAlpha = 0.95;
+            ctx.arc(cx, cy, outerR, headStart, startAngle + shimLen);
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        // Comet 1 — green, leads
+        drawComet(shimA,           '#3dc47d');
+        // Comet 2 — red, 180° opposite
+        drawComet(shimA + Math.PI, '#f3535b');
 
         // ═════════════════════════════════════════════════════════════════════
         // 2. BACKGROUND TRACK
@@ -207,7 +235,7 @@
             ctx.strokeStyle = this.colorFg;
             ctx.lineWidth   = lw;
             ctx.shadowColor = this.colorFg;
-            ctx.shadowBlur  = lw * 2.5;
+            ctx.shadowBlur  = lw * 0.5;
             if (this.round) ctx.lineCap = 'round';
             ctx.arc(cx, cy, r, this._indetA, this._indetB);
             ctx.stroke();
@@ -244,7 +272,7 @@
                 }
 
                 // Glow — pulsing slightly
-                var glowPulse = lw * (2.0 + 0.6 * Math.sin(this._glowT * 3));
+                var glowPulse = lw * (0.3 + 0.1 * Math.sin(this._glowT * 3));
 
                 ctx.beginPath();
                 ctx.strokeStyle = grad;
@@ -262,7 +290,7 @@
                 ctx.beginPath();
                 ctx.fillStyle   = accent;
                 ctx.shadowColor = accent;
-                ctx.shadowBlur  = lw * 3;
+                ctx.shadowBlur  = lw * 0.5;
                 ctx.arc(tipX, tipY, lw * 0.38, 0, TAU);
                 ctx.fill();
                 ctx.shadowBlur = 0;
