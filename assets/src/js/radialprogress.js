@@ -147,9 +147,9 @@
         }
 
         var ctx    = canvas.getContext('2d');
+        var lw     = this.thick * bw * dp;
         var glowPad = lw * 1.2;  // extra room so shadowBlur doesn't clip at canvas edge
         var r      = H / 2 - (this.thick * bw * dp) / 2 - glowPad;
-        var lw     = this.thick * bw * dp;
         var TAU    = Math.PI * 2;
         var START  = -Math.PI / 2;
 
