@@ -389,55 +389,55 @@ nav>ul>li .nav-item.active {
 
 @media only screen and (max-width: 768px) {
     nav>ul {
-        position: fixed;
-        top: 5rem;
-        padding: 0.5rem;
-        right: -100%;
-        flex-direction: column;
-        background: var(--bg-nav);
-        width: calc(100% - 1rem);
-        border-radius: 10px;
-        text-align: center;
-        transition: 0.3s;
-        box-shadow: var(--shadow);
+position: fixed;
+top: 5rem;
+padding: 0.5rem;
+right: -100%;
+flex-direction: column;
+background: var(--bg-nav);
+width: calc(100% - 1rem);
+border-radius: 10px;
+text-align: center;
+transition: 0.3s;
+box-shadow: var(--shadow);
     }
 
     nav>button {
-        display: block;
-        cursor: pointer;
+display: block;
+cursor: pointer;
     }
 
     nav.active::before {
-        content: "";
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(17, 17, 17, 0.6);
-        z-index: -1;
+content: "";
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(17, 17, 17, 0.6);
+z-index: -1;
     }
 
     nav.active>ul {
-        right: 0.5rem;
+right: 0.5rem;
     }
 
     nav.active>button svg line:nth-child(1) {
-        opacity: 0;
-        transform: translateY(-100%);
+opacity: 0;
+transform: translateY(-100%);
     }
 
     nav.active>button svg line:nth-child(4) {
-        opacity: 0;
-        transform: translateY(100%);
+opacity: 0;
+transform: translateY(100%);
     }
 
     nav.active>button svg line:nth-child(2) {
-        transform: rotate(45deg);
+transform: rotate(45deg);
     }
 
     nav.active>button svg line:nth-child(3) {
-        transform: rotate(-45deg);
+transform: rotate(-45deg);
     }
 }
 
@@ -580,14 +580,14 @@ main.full {
 
     .row:not(.keep-width),
     .grid:not(.keep-width) {
-        flex-direction: column !important;
+flex-direction: column !important;
     }
 
     .row:not(.keep-width)>[class*=col],
     .row:not(.keep-width)>div,
     .grid:not(.keep-width)>[class*=col],
     .grid:not(.keep-width)>div {
-        width: auto;
+width: auto;
     }
 }
 
@@ -852,162 +852,162 @@ select:hover {
 
 @supports (-webkit-appearance: none) or (-moz-appearance: none) {
     input[type=range] {
-        -webkit-appearance: none;
-        width: 100%;
-        height: 0.8rem;
-        border-radius: var(--radius);
-        border: 2px solid var(--brd);
-        background: var(--bg);
-        outline: none;
-        margin-top: 0.8rem;
+-webkit-appearance: none;
+width: 100%;
+height: 0.8rem;
+border-radius: var(--radius);
+border: 2px solid var(--brd);
+background: var(--bg);
+outline: none;
+margin-top: 0.8rem;
     }
 
     input[type=range]::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        transition: background 0.15s ease-in-out;
-        -webkit-transition: background 0.15s ease-in-out;
-        width: 22px;
-        height: 22px;
-        border-radius: 50%;
-        background: var(--primary);
-        cursor: pointer;
-        transition: background 0.15s ease-in-out;
+-webkit-appearance: none;
+transition: background 0.15s ease-in-out;
+-webkit-transition: background 0.15s ease-in-out;
+width: 22px;
+height: 22px;
+border-radius: 50%;
+background: var(--primary);
+cursor: pointer;
+transition: background 0.15s ease-in-out;
     }
 
     input[type=range]:hover::-webkit-slider-thumb {
-        box-shadow: 0 0 0 1px var(--bg2), 0 0 0 4px var(--primary);
+box-shadow: 0 0 0 1px var(--bg2), 0 0 0 4px var(--primary);
     }
 
     input[type=range]:hover::-moz-range-thumb {
-        box-shadow: 0 0 0 1px var(--bg2), 0 0 0 4px var(--primary);
+box-shadow: 0 0 0 1px var(--bg2), 0 0 0 4px var(--primary);
     }
 
     input[type=checkbox],
     input[type=radio] {
-        height: 21px;
-        outline: none;
-        position: relative;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        margin: 0;
-        padding: 0;
-        box-shadow: none;
-        cursor: pointer;
-        vertical-align: middle;
-        top: -1px;
-        height: 21px;
-        border: 2px solid var(--brd);
-        background: var(--bg);
-        transition: background 0.3s ease, border-color 0.3s ease;
+height: 21px;
+outline: none;
+position: relative;
+-webkit-appearance: none;
+-moz-appearance: none;
+margin: 0;
+padding: 0;
+box-shadow: none;
+cursor: pointer;
+vertical-align: middle;
+top: -1px;
+height: 21px;
+border: 2px solid var(--brd);
+background: var(--bg);
+transition: background 0.3s ease, border-color 0.3s ease;
     }
 
     input[type=checkbox]:after,
     input[type=radio]:after {
-        content: "";
-        display: block;
-        left: 0;
-        top: 0;
-        position: absolute;
-        transition: transform 0.3s ease, opacity 0.2s ease, filter 0.3s ease;
+content: "";
+display: block;
+left: 0;
+top: 0;
+position: absolute;
+transition: transform 0.3s ease, opacity 0.2s ease, filter 0.3s ease;
     }
 
     input[type=checkbox]:checked,
     input[type=radio]:checked {
-        background: var(--primary);
-        border-color: var(--primary);
+background: var(--primary);
+border-color: var(--primary);
     }
 
     input[type=checkbox]:checked:after,
     input[type=radio]:checked:after {
-        transition: opacity 0.3s ease, filter 0.3s ease, transform 0.6s cubic-bezier(0.175, 0.88, 0.32, 1.2);
+transition: opacity 0.3s ease, filter 0.3s ease, transform 0.6s cubic-bezier(0.175, 0.88, 0.32, 1.2);
     }
 
     input[type=checkbox]:disabled,
     input[type=radio]:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
+opacity: 0.5;
+cursor: not-allowed;
     }
 
     input[type=checkbox]:hover:not(:checked):not(:disabled),
     input[type=radio]:hover:not(:checked):not(:disabled) {
-        border-color: var(--primary);
+border-color: var(--primary);
     }
 
     input[type=checkbox]:not(.toggle),
     input[type=radio]:not(.toggle) {
-        width: 21px;
+width: 21px;
     }
 
     input[type=checkbox]:not(.toggle):after,
     input[type=radio]:not(.toggle):after {
-        opacity: 0;
+opacity: 0;
     }
 
     input[type=checkbox]:not(.toggle):checked:after,
     input[type=radio]:not(.toggle):checked:after {
-        opacity: 1;
+opacity: 1;
     }
 
     input[type=checkbox]:not(.toggle) {
-        border-radius: var(--radius);
+border-radius: var(--radius);
     }
 
     input[type=checkbox]:not(.toggle):after {
-        width: 5px;
-        height: 9px;
-        border: 2px solid var(--bg);
-        border-top: 0;
-        border-left: 0;
-        left: 6px;
-        top: 2px;
-        transform: rotate(20deg);
+width: 5px;
+height: 9px;
+border: 2px solid var(--bg);
+border-top: 0;
+border-left: 0;
+left: 6px;
+top: 2px;
+transform: rotate(20deg);
     }
 
     input[type=checkbox]:not(.toggle):checked:after {
-        transform: rotate(43deg);
+transform: rotate(43deg);
     }
 
     input[type=checkbox].toggle {
-        width: 39px;
-        border-radius: 10px;
+width: 39px;
+border-radius: 10px;
     }
 
     input[type=checkbox].toggle:after {
-        left: 2px;
-        top: 1px;
-        border-radius: 50%;
-        width: 15px;
-        height: 15px;
-        background: var(--brd);
+left: 2px;
+top: 1px;
+border-radius: 50%;
+width: 15px;
+height: 15px;
+background: var(--brd);
     }
 
     input[type=checkbox].toggle:checked:after {
-        background: var(--bg);
-        transform: translateX(17px);
+background: var(--bg);
+transform: translateX(17px);
     }
 
     input[type=checkbox].toggle:disabled:not(:checked):after {
-        opacity: 0.6;
+opacity: 0.6;
     }
 
     input[type=radio] {
-        border-radius: 50%;
+border-radius: 50%;
     }
 
     input[type=radio]:after {
-        width: 19px;
-        height: 19px;
-        top: -1px;
-        left: -1px;
-        border-radius: 50%;
-        background: var(--bg3);
-        opacity: 0;
-        transform: scale(0.7);
+width: 19px;
+height: 19px;
+top: -1px;
+left: -1px;
+border-radius: 50%;
+background: var(--bg3);
+opacity: 0;
+transform: scale(0.7);
     }
 
     input[type=radio]:checked:after {
-        background: var(--bg);
-        transform: scale(0.5);
+background: var(--bg);
+transform: scale(0.5);
     }
 }
 
@@ -1326,44 +1326,44 @@ table tfoot {
     th,
     td,
     tr {
-        display: block;
+display: block;
     }
 
     table {
-        border: 0;
+border: 0;
     }
 
     table thead {
-        display: none;
+display: none;
     }
 
     table caption {
-        display: block;
-        font-size: 1.3em;
+display: block;
+font-size: 1.3em;
     }
 
     table tr {
-        border-bottom: 2px solid var(--brd-table);
-        display: block;
+border-bottom: 2px solid var(--brd-table);
+display: block;
     }
 
     table td {
-        border-bottom: 1px solid var(--brd-table);
-        font-size: 0.8em;
-        display: flex;
-        align-items: center;
+border-bottom: 1px solid var(--brd-table);
+font-size: 0.8em;
+display: flex;
+align-items: center;
     }
 
     table td::before {
-        content: attr(data-column);
-        text-align: left;
-        width: 45%;
-        font-weight: bold;
-        text-transform: uppercase;
+content: attr(data-column);
+text-align: left;
+width: 45%;
+font-weight: bold;
+text-transform: uppercase;
     }
 
     table td:last-child {
-        border-bottom: 0;
+border-bottom: 0;
     }
 }
 
@@ -1473,21 +1473,21 @@ svg.wave>path {
 
 @-webkit-keyframes wave {
     0% {
-        transform: translateX(0);
+transform: translateX(0);
     }
 
     100% {
-        transform: translateX(-100%);
+transform: translateX(-100%);
     }
 }
 
 @keyframes wave {
     0% {
-        transform: translateX(0);
+transform: translateX(0);
     }
 
     100% {
-        transform: translateX(-100%);
+transform: translateX(-100%);
     }
 }
 
@@ -1570,49 +1570,49 @@ svg.wave>path {
 
 @-webkit-keyframes fade-out {
     from {
-        opacity: 1;
-        transform: scaleY(1);
+opacity: 1;
+transform: scaleY(1);
     }
 
     to {
-        opacity: 0;
-        transform: scaleY(0);
+opacity: 0;
+transform: scaleY(0);
     }
 }
 
 @keyframes fade-out {
     from {
-        opacity: 1;
-        transform: scaleY(1);
+opacity: 1;
+transform: scaleY(1);
     }
 
     to {
-        opacity: 0;
-        transform: scaleY(0);
+opacity: 0;
+transform: scaleY(0);
     }
 }
 
 @-webkit-keyframes fade-in {
     from {
-        opacity: 0;
-        transform: scaleY(0);
+opacity: 0;
+transform: scaleY(0);
     }
 
     to {
-        opacity: 1;
-        transform: scaleY(1);
+opacity: 1;
+transform: scaleY(1);
     }
 }
 
 @keyframes fade-in {
     from {
-        opacity: 0;
-        transform: scaleY(0);
+opacity: 0;
+transform: scaleY(0);
     }
 
     to {
-        opacity: 1;
-        transform: scaleY(1);
+opacity: 1;
+transform: scaleY(1);
     }
 }
 
@@ -1939,3 +1939,372 @@ svg.wave>path {
     color: var(--txt-r) !important;
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   THEME-AWARE COLOR TOKENS
+   Used for rgba() in animations where CSS vars don't compose
+═══════════════════════════════════════════════════════════════ */
+html, [data-theme=light] {
+    --ga0:  rgba(61, 196, 125, 0);
+    --ga10: rgba(61, 196, 125, 0.10);
+    --ga20: rgba(61, 196, 125, 0.20);
+    --ga50: rgba(61, 196, 125, 0.50);
+    --ga90: rgba(61, 196, 125, 0.90);
+    --ra10: rgba(255, 65, 50,  0.10);
+    --scan-bg: rgba(255,255,255,0.55);
+    --log-bg:  rgba(237,240,242,0.7);
+    --log-txt: #14191f;
+}
+[data-theme=dark] {
+    --ga0:  rgba(103, 229, 168, 0);
+    --ga10: rgba(103, 229, 168, 0.10);
+    --ga20: rgba(103, 229, 168, 0.20);
+    --ga50: rgba(103, 229, 168, 0.50);
+    --ga90: rgba(103, 229, 168, 0.90);
+    --ra10: rgba(255, 86,  77,  0.10);
+    --scan-bg: rgba(20, 25, 31, 0.6);
+    --log-bg:  rgba(20, 25, 31, 0.8);
+    --log-txt: rgba(242,244,247,0.8);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DASHBOARD CARD — overrides .card flex defaults
+═══════════════════════════════════════════════════════════════ */
+.dash-card {
+    gap: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--ga20);
+    position: relative;
+}
+
+/* Subtle dot-grid texture on the card background */
+.dash-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+radial-gradient(circle, var(--ga10) 1px, transparent 1px);
+    background-size: 24px 24px;
+    pointer-events: none;
+    z-index: 0;
+}
+.dash-card > * { position: relative; z-index: 1; }
+
+/* ═══════════════════════════════════════════════════════════════
+   STATUS BAR — top strip
+═══════════════════════════════════════════════════════════════ */
+.status-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.65rem 1.25rem;
+    border-bottom: 1px solid var(--ga10);
+    background: var(--scan-bg);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    font-size: 0.78rem;
+    font-family: monospace;
+    letter-spacing: 0.06em;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+.status-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--txt);
+}
+
+/* Animated pulse dot */
+.scan-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 0 0 var(--ga50);
+    animation: dot-pulse 1.6s ease-in-out infinite;
+    flex-shrink: 0;
+    transition: background 0.4s, box-shadow 0.4s;
+}
+.scan-dot.done {
+    background: var(--green);
+    box-shadow: 0 0 0 4px var(--ga20);
+    animation: none;
+}
+@keyframes dot-pulse {
+    0%   { box-shadow: 0 0 0 0   var(--ga50); }
+    70%  { box-shadow: 0 0 0 8px var(--ga0);  }
+    100% { box-shadow: 0 0 0 0   var(--ga0);  }
+}
+
+.scan-progress {
+    font-variant-numeric: tabular-nums;
+    color: var(--txt);
+    opacity: 0.55;
+    font-size: 0.75rem;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MAIN DASHBOARD ROW
+═══════════════════════════════════════════════════════════════ */
+.dash-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2.5rem;
+    padding: 2rem 1.5rem 1.5rem;
+    flex-wrap: wrap;
+}
+
+/* ── LEFT: Radar + stats ──────────────────────────────────────── */
+.dash-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+/* Radar widget */
+.radar-wrap {
+    position: relative;
+    width: 8em; height: 8em;
+    border-radius: 50%;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+/* Outer ring */
+.radar-wrap::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1px solid var(--ga20);
+    z-index: 2;
+    pointer-events: none;
+}
+/* Mid ring */
+.radar-ring-mid {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 66%; height: 66%;
+    border-radius: 50%;
+    border: 1px solid var(--ga10);
+    z-index: 2;
+}
+/* Inner ring */
+.radar-ring-in {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 33%; height: 33%;
+    border-radius: 50%;
+    border: 1px solid var(--ga10);
+    z-index: 2;
+}
+/* Cross-hair lines */
+.radar-cross {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+}
+.radar-cross::before,
+.radar-cross::after {
+    content: '';
+    position: absolute;
+    background: var(--ga10);
+}
+.radar-cross::before {
+    width: 1px; height: 100%;
+    left: 50%; transform: translateX(-50%);
+}
+.radar-cross::after {
+    height: 1px; width: 100%;
+    top: 50%; transform: translateY(-50%);
+}
+/* Sweep layer */
+.radar-sweep {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(
+from 0deg,
+var(--ga0)  0deg,
+var(--ga0)  240deg,
+var(--ga10) 280deg,
+var(--ga50) 340deg,
+var(--ga90) 360deg
+    );
+    animation: radar-spin 2.8s linear infinite;
+    z-index: 1;
+}
+@keyframes radar-spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+/* Center dot */
+.radar-center {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 6px; height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--green), 0 0 20px var(--ga50);
+    z-index: 3;
+}
+/* Completion state */
+.radar-done {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    z-index: 4;
+    background: var(--ga10);
+    border-radius: 50%;
+}
+.radar-done svg {
+    width: 2.5em; height: 2.5em;
+    stroke: var(--green);
+    filter: drop-shadow(0 0 8px var(--green));
+}
+.radar-wrap.scan-done .radar-sweep {
+    animation: none;
+    opacity: 0;
+    transition: opacity 0.4s;
+}
+.radar-wrap.scan-done .radar-done {
+    opacity: 1;
+}
+
+/* Stats below radar */
+.stats-grid {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    border: 1px solid var(--ga20);
+    border-radius: var(--radius);
+    overflow: hidden;
+    width: 100%;
+    max-width: 12em;
+}
+.stat-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    gap: 0.2rem;
+}
+.stat-item:first-child {
+    border-right: 1px solid var(--ga20);
+}
+.stat-val {
+    font-family: monospace;
+    font-size: 1.5rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--txt);
+    line-height: 1;
+    transition: color 0.3s;
+}
+.stat-lbl {
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    opacity: 0.45;
+    color: var(--txt);
+}
+
+/* ── CENTER: Score ring ──────────────────────────────────────── */
+.dash-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+}
+/* Override existing #bar size rule from main.min.css */
+#bar {
+    width: 11em !important;
+    margin: 0 !important;
+}
+.score-lbl {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    opacity: 0.4;
+    color: var(--txt);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LOG TERMINAL — #testingInfo
+═══════════════════════════════════════════════════════════════ */
+.log-terminal {
+    margin: 0 1.25rem 1rem;
+    padding: 0.6rem 0.8rem;
+    background: var(--log-bg);
+    border: 1px solid var(--ga10);
+    border-radius: var(--radius);
+    font-family: monospace;
+    font-size: 0.72rem;
+    color: var(--log-txt);
+    max-height: 5.5rem;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    line-height: 1.7;
+    letter-spacing: 0.02em;
+}
+/* Scrollbar */
+.log-terminal::-webkit-scrollbar { width: 4px; }
+.log-terminal::-webkit-scrollbar-track { background: transparent; }
+.log-terminal::-webkit-scrollbar-thumb {
+    background: var(--ga20);
+    border-radius: 2px;
+}
+/* Each log line appended by app.js */
+.log-terminal div {
+    padding: 0;
+    opacity: 0.75;
+}
+.log-terminal div::before {
+    content: '-';
+    color: var(--black);
+    opacity: 0.6;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LEGEND + ACTIONS SECTION
+═══════════════════════════════════════════════════════════════ */
+.dash-footer {
+    padding: 0 1.25rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+.legend-row {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE — stack on small screens
+═══════════════════════════════════════════════════════════════ */
+@media (max-width: 440px) {
+    .dash-row {
+gap: 1.5rem;
+padding: 1.5rem 1rem 1rem;
+    }
+    .dash-left, .dash-center { width: 100%; }
+    .dash-center { order: -1; } /* score first on mobile */
+    .stats-grid { max-width: 100%; }
+}
