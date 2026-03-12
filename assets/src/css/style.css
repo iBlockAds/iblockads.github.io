@@ -2132,8 +2132,8 @@ html, [data-theme=light] {
     opacity: 0.75;
 }
 .log-terminal div::before {
-    content: '> ';
-    color: var(--green);
+    content: '-';
+    color: var(--black);
     opacity: 0.6;
 }
 
