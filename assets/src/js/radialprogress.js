@@ -240,14 +240,23 @@
 
                 // Arc tip position for gradient end
                 var endAngle = START + this._aniP * TAU;
-                var grad = ctx.createLinearGradient(
-                    cx + r * Math.cos(START),
-                    cy + r * Math.sin(START),
-                    cx + r * Math.cos(endAngle),
-                    cy + r * Math.sin(endAngle)
-                );
-                grad.addColorStop(0, this.colorFg);
-                grad.addColorStop(1, accent);
+
+                // At ~100% the start and end tips are the same point —
+                // createLinearGradient degenerates and browsers fall back to
+                // colorBg (red). Detect this and use a solid colour instead.
+                var x0 = cx + r * Math.cos(START);
+                var y0 = cy + r * Math.sin(START);
+                var x1 = cx + r * Math.cos(endAngle);
+                var y1 = cy + r * Math.sin(endAngle);
+                var degenerate = Math.abs(x1 - x0) < 1 && Math.abs(y1 - y0) < 1;
+                var grad;
+                if (degenerate) {
+                    grad = this.colorFg; // solid — avoids the red fallback
+                } else {
+                    grad = ctx.createLinearGradient(x0, y0, x1, y1);
+                    grad.addColorStop(0, this.colorFg);
+                    grad.addColorStop(1, accent);
+                }
 
                 // Glow — pulsing slightly
                 var glowPulse = lw * (2.0 + 0.6 * Math.sin(this._glowT * 3));
