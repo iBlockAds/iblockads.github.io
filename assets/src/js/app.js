@@ -137,7 +137,7 @@ class AdBlockTester {
     // Called once, after the DOM is confirmed ready.
     init() {
         this.bar = new RadialProgress(document.getElementById('bar'), {
-            colorBg: "#ff3b3f", colorFg: "#3cc47c", colorText: "#ffffff", thick: 12, round: true
+            colorBg: "#ff3b3f", colorFg: "#3cc47c", colorText: "#ffffff", thick: 15, round: true
         });
         this.notification = new Notif({
             topPos: 10, classNames: 'success', autoClose: true, autoCloseTimeout: 2000
