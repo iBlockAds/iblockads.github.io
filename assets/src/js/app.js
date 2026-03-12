@@ -10,8 +10,8 @@ class Navbar {
         if (!this.nav) return;
         this.initListeners();
     }
-    open() { document.body.style.overflow = "hidden"; this.nav.classList.add("active"); }
-    close() { document.body.style.overflow = "auto"; this.nav.classList.remove("active"); }
+    open()  { document.body.style.overflow = "hidden"; this.nav.classList.add("active"); }
+    close() { document.body.style.overflow = "auto";   this.nav.classList.remove("active"); }
     initListeners() {
         const btn = this.nav.querySelector("button");
         if (btn) btn.addEventListener("click", () => this.nav.classList.contains("active") ? this.close() : this.open());
@@ -82,7 +82,7 @@ class Semaphore {
         this._limit = limit;
         this._active = 0;
         this._queue = [];
-        this._head = 0;
+        this._head  = 0;
     }
     acquire() {
         if (this._active < this._limit) { this._active++; return Promise.resolve(); }
@@ -91,13 +91,13 @@ class Semaphore {
     release() {
         if (this._head < this._queue.length) {
             const next = this._queue[this._head];
-            this._queue[this._head] = null; 
+            this._queue[this._head] = null;
             this._head++;
             if (this._head > 64 && this._head > (this._queue.length >> 1)) {
                 this._queue = this._queue.slice(this._head);
-                this._head = 0;
+                this._head  = 0;
             }
-            next(); 
+            next();
         } else {
             this._active--;
         }
@@ -107,26 +107,51 @@ class Semaphore {
 // ====================== MAIN TESTER ======================
 class AdBlockTester {
     constructor() {
-        this.totalTests = 0;
-        this.blockedCount = 0;
-        this.CONCURRENCY = 40;
-        this.TIMEOUT_MS  = 3000;
+        this.totalTests     = 0;
+        this.blockedCount   = 0;
+        this.unblockedCount = 0;
+        this.completedCount = 0;
+        this.CONCURRENCY    = 40;
+        this.TIMEOUT_MS     = 3000;
+        this.pendingChecks  = [];
+        this._sem           = new Semaphore(this.CONCURRENCY);
+        this._hostnameCache = new Map();
+        this._paintQueue    = [];
+        this._rafScheduled  = false;
+        this._activeTest    = null;
 
+        // DOM refs — populated by init()
+        this.bar         = null;
+        this.notification= null;
+        this.testWrapper = null;
+        this._elBlocked  = null;
+        this._elTotal    = null;
+        this._elChecked  = null;
+        this._elProgress = null;
+        this._elLabel    = null;
+        this._elDot      = null;
+        this._elRadar    = null;
+    }
+
+    // Called once, after the DOM is confirmed ready.
+    init() {
         this.bar = new RadialProgress(document.getElementById('bar'), {
-            colorBg: "#ff3b3f", colorFg: "#3cc47c", colorText: "#202020", thick: 12
+            colorBg: "#ff3b3f", colorFg: "#3cc47c", colorText: "#ffffff", thick: 12, round: true
         });
         this.notification = new Notif({
             topPos: 10, classNames: 'success', autoClose: true, autoCloseTimeout: 2000
         });
-        this.testWrapper = document.getElementById("test");
-        this.pendingChecks = [];
-        this._sem = new Semaphore(this.CONCURRENCY);
-        this._hostnameCache = new Map();
-        this._paintQueue  = [];
-        this._rafScheduled = false;
-        this._activeTest = null;
+        this.testWrapper  = document.getElementById("test");
+        this._elBlocked   = document.getElementById('stat-blocked');
+        this._elUnblocked = document.getElementById('stat-unblocked');
+        this._elChecked   = document.getElementById('stat-checked');
+        this._elProgress  = document.getElementById('scan-progress');
+        this._elLabel     = document.getElementById('scan-label');
+        this._elDot       = document.getElementById('scan-dot');
+        this._elRadar     = document.getElementById('radar-wrap');
     }
 
+    // Batched rAF paint — one repaint per frame
     _schedulePaint(fn) {
         this._paintQueue.push(fn);
         if (!this._rafScheduled) {
@@ -135,7 +160,16 @@ class AdBlockTester {
                 this._rafScheduled = false;
                 const q = this._paintQueue.splice(0);
                 for (let i = 0; i < q.length; i++) q[i]();
-                if (this.totalTests > 0) this.bar.setValue(this.blockedCount / this.totalTests);
+
+                // Update score ring and live counters once per frame
+                if (this.totalTests > 0) {
+                    this.bar.setValue(this.blockedCount / this.totalTests);
+                    if (this._elBlocked)   this._elBlocked.textContent   = this.blockedCount;
+                    if (this._elUnblocked) this._elUnblocked.textContent = this.unblockedCount;
+                    if (this._elChecked)  this._elChecked.textContent  = this.completedCount;
+                    if (this._elProgress) this._elProgress.textContent =
+                        this.completedCount + ' / ' + this.totalTests;
+                }
             });
         }
     }
@@ -150,16 +184,14 @@ class AdBlockTester {
         if (this._hostnameCache.has(hostname)) return this._hostnameCache.get(hostname);
 
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), this.TIMEOUT_MS);
+        const timeoutId  = setTimeout(() => controller.abort(), this.TIMEOUT_MS);
 
         const p = fetch(url, {
-            method: 'HEAD',
-            mode: 'no-cors',
-            cache: 'no-store',
+            method: 'HEAD', mode: 'no-cors', cache: 'no-store',
             signal: controller.signal
         })
             .then(() => false)
-            .catch(() => true)  
+            .catch(() => true)
             .finally(() => clearTimeout(timeoutId));
 
         this._hostnameCache.set(hostname, p);
@@ -190,12 +222,14 @@ class AdBlockTester {
         }
 
         this._schedulePaint(() => {
+            this.completedCount++;
             if (blocked) {
                 hostDiv.style.background = "var(--green)";
                 if (!isNonPoint) this.blockedCount++;
             } else {
                 testDiv.style.background = "var(--red)";
                 hostDiv.style.background = "var(--red)";
+                if (!isNonPoint) this.unblockedCount++;
             }
         });
     }
@@ -214,8 +248,8 @@ class AdBlockTester {
     }
 
     async fetchTests() {
-        const testingInfoLoading = document.getElementById("testingInfo");
-        const fragment = document.createDocumentFragment();
+        const testingInfoEl = document.getElementById("testingInfo");
+        const fragment  = document.createDocumentFragment();
         const infoNodes = [];
 
         for (const element in data) {
@@ -229,7 +263,7 @@ class AdBlockTester {
 
             for (const key in category) {
                 const div = document.createElement('div');
-                const dw = document.createElement('div');
+                const dw  = document.createElement('div');
                 div.classList.add("test");
                 div.id = key;
                 div.style.background = "var(--green)";
@@ -246,7 +280,7 @@ class AdBlockTester {
             }
 
             const testInfo = document.createElement("div");
-            testInfo.textContent = `Kiểm tra dữ liệu => ${element} | Số lần kiểm tra => ${countTests}`;
+            testInfo.textContent = `> ${element}: ${countTests} mục`;
             infoNodes.push(testInfo);
         }
 
@@ -258,7 +292,7 @@ class AdBlockTester {
 
         for (const key in dataOEM) {
             const div = document.createElement('div');
-            const dw = document.createElement('div');
+            const dw  = document.createElement('div');
             div.classList.add("test");
             div.id = key;
             div.style.background = "var(--green)";
@@ -272,14 +306,28 @@ class AdBlockTester {
             }
         }
 
-        // Single DOM insertion
         this.testWrapper.appendChild(fragment);
 
+        // Update total counter now that we know totalTests
+        if (this._elProgress) this._elProgress.textContent = '0 / ' + this.totalTests;
+
+        // Append log entries
         const infoFrag = document.createDocumentFragment();
         infoNodes.forEach(n => infoFrag.appendChild(n));
-        testingInfoLoading.appendChild(infoFrag);
+        if (testingInfoEl) {
+            testingInfoEl.appendChild(infoFrag);
+            testingInfoEl.scrollTop = testingInfoEl.scrollHeight;
+        }
 
         await this.runAll(this.pendingChecks);
+
+        // All tests complete — transition to done state
+        if (this._elLabel)  this._elLabel.textContent  = 'Hoàn thành!';
+        if (this._elDot)    this._elDot.classList.add('done');
+        if (this._elRadar)  this._elRadar.classList.add('scan-done');
+        if (this._elProgress) this._elProgress.textContent = this.totalTests + ' / ' + this.totalTests;
+
+        console.log('Đã hoàn thành tất cả các bài kiểm tra!');
     }
 
     copyToClip(str) {
@@ -303,31 +351,19 @@ class AdBlockTester {
     }
 }
 
-// ====================== GLOBAL INSTANCE ======================
-let adBlockTester = new AdBlockTester();
-window.copyToClip = (str) => adBlockTester.copyToClip(str);
-window.show_info  = (t)  => adBlockTester.show_info(t);
+let adBlockTester;
+
+new Navbar();
+new ThemeManager();
+new GoTop();
+new AOS();
+new Modal();
+
+adBlockTester        = new AdBlockTester();
+window.copyToClip    = (str) => adBlockTester.copyToClip(str);
+window.show_info     = (t)   => adBlockTester.show_info(t);
 window.adBlockTester = adBlockTester;
 
-// ====================== START ======================
-document.addEventListener("DOMContentLoaded", function () {
-    new Navbar();
-    new ThemeManager();
-    new GoTop();
-    new AOS();
-    new Modal();
+adBlockTester.init();
 
-    adBlockTester.pendingChecks = [];
-    adBlockTester.fetchTests().then(() => {
-        const loading = document.querySelector(".loadingWrap");
-        if (loading) {
-            loading.style.transition = "opacity 400ms";
-            loading.style.opacity = "0";
-            setTimeout(() => {
-                loading.style.display = "none";
-                document.body.classList.remove("_overflowhidden");
-                console.log("Đã hoàn thành tất cả các bài kiểm tra!");
-            }, 400);
-        }
-    });
-});
+adBlockTester.fetchTests();
