@@ -132,7 +132,6 @@ class AdBlockTester {
         this._elProgress = null;
         this._elLabel    = null;
         this._elDot      = null;
-        this._elRadar    = null;
     }
 
     // Called once, after the DOM is confirmed ready.
@@ -150,7 +149,6 @@ class AdBlockTester {
         this._elProgress  = document.getElementById('scan-progress');
         this._elLabel     = document.getElementById('scan-label');
         this._elDot       = document.getElementById('scan-dot');
-        this._elRadar     = document.getElementById('radar-wrap');
     }
 
     // Batched rAF paint — one repaint per frame
@@ -326,7 +324,6 @@ class AdBlockTester {
         // All tests complete — transition to done state
         if (this._elLabel)  this._elLabel.textContent  = 'Hoàn thành!';
         if (this._elDot)    this._elDot.classList.add('done');
-        if (this._elRadar)  this._elRadar.classList.add('scan-done');
         if (this._elProgress) this._elProgress.textContent = this.totalTests + ' / ' + this.totalTests;
 
         console.log('Đã hoàn thành tất cả các bài kiểm tra!');
