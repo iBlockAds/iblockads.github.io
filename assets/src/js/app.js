@@ -107,6 +107,8 @@ class Semaphore {
 // ====================== MAIN TESTER ======================
 class AdBlockTester {
     constructor() {
+        // Constructor touches NO DOM at all.
+        // All getElementById calls live in init(), called explicitly after DOM ready.
         this.totalTests     = 0;
         this.blockedCount   = 0;
         this.unblockedCount = 0;
@@ -222,7 +224,7 @@ class AdBlockTester {
         }
 
         this._schedulePaint(() => {
-            this.completedCount++;
+            if (!isNonPoint) this.completedCount++;
             if (blocked) {
                 hostDiv.style.background = "var(--green)";
                 if (!isNonPoint) this.blockedCount++;
@@ -351,6 +353,7 @@ class AdBlockTester {
     }
 }
 
+// ====================== GLOBAL VARIABLE ======================
 let adBlockTester;
 
 new Navbar();
