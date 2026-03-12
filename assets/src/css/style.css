@@ -1972,23 +1972,12 @@ html, [data-theme=light] {
 .dash-card {
     gap: 0;
     padding: 0;
-    overflow: hidden;
-    border: 1px solid var(--ga20);
+    overflow: visible;
+    border: none;
+    background: transparent;
+    box-shadow: none;
     position: relative;
 }
-
-/* Subtle dot-grid texture on the card background */
-.dash-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image:
-radial-gradient(circle, var(--ga10) 1px, transparent 1px);
-    background-size: 24px 24px;
-    pointer-events: none;
-    z-index: 0;
-}
-.dash-card > * { position: relative; z-index: 1; }
 
 /* ═══════════════════════════════════════════════════════════════
    STATUS BAR — top strip
@@ -2062,10 +2051,7 @@ radial-gradient(circle, var(--ga10) 1px, transparent 1px);
 .stats-grid {
     display: flex;
     align-items: stretch;
-    gap: 0;
-    border: 1px solid var(--ga20);
-    border-radius: var(--radius);
-    overflow: hidden;
+    gap: 0.5rem;
     width: 100%;
     max-width: 11em;
 }
@@ -2076,9 +2062,7 @@ radial-gradient(circle, var(--ga10) 1px, transparent 1px);
     align-items: center;
     padding: 0.5rem 0.75rem;
     gap: 0.2rem;
-}
-.stat-item:first-child {
-    border-right: 1px solid var(--ga20);
+    border-radius: var(--radius);
 }
 .stat-val {
     font-family: monospace;
