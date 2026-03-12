@@ -68,12 +68,12 @@
 
         // ── Wrapper div ───────────────────────────────────────────────────────
         var wrap = document.createElement('div');
-        wrap.style.cssText = 'position:relative;width:10em;height:10em;';
+        wrap.style.cssText = 'position:relative;width:10em;height:10em;background:transparent;';
         container.appendChild(wrap);
 
         // ── Canvas ────────────────────────────────────────────────────────────
         var canvas = document.createElement('canvas');
-        canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;';
+        canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;background:transparent;';
         canvas.className = 'rp_canvas';
         wrap.appendChild(canvas);
         this._canvas = canvas;
