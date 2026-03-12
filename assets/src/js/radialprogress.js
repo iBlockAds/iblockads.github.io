@@ -147,7 +147,8 @@
         }
 
         var ctx    = canvas.getContext('2d');
-        var r      = H / 2 - (this.thick * bw * dp) / 2;
+        var glowPad = lw * 1.2;  // extra room so shadowBlur doesn't clip at canvas edge
+        var r      = H / 2 - (this.thick * bw * dp) / 2 - glowPad;
         var lw     = this.thick * bw * dp;
         var TAU    = Math.PI * 2;
         var START  = -Math.PI / 2;
@@ -192,22 +193,6 @@
         ctx.arc(cx, cy, r, 0, TAU);
         ctx.stroke();
 
-        // ═════════════════════════════════════════════════════════════════════
-        // 3. TICK MARKS at 25 / 50 / 75 / 100 %
-        // ═════════════════════════════════════════════════════════════════════
-        var tickAngles = [0, 0.25, 0.5, 0.75];
-        var innerR = r - lw * 0.7;
-        var outerT = r + lw * 0.7;
-        for (var i = 0; i < tickAngles.length; i++) {
-            var ta  = START + tickAngles[i] * TAU;
-            var lit = this._aniP >= tickAngles[i] - 0.01;
-            ctx.beginPath();
-            ctx.strokeStyle = lit ? rgba(this.colorFg, 0.9) : rgba(this.colorBg, 0.5);
-            ctx.lineWidth   = dp * 1.5;
-            ctx.moveTo(cx + innerR * Math.cos(ta), cy + innerR * Math.sin(ta));
-            ctx.lineTo(cx + outerT * Math.cos(ta), cy + outerT * Math.sin(ta));
-            ctx.stroke();
-        }
 
         // ═════════════════════════════════════════════════════════════════════
         // 4. FOREGROUND ARC — gradient + neon glow
